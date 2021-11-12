@@ -72,6 +72,13 @@ const run = async () => {
             res.json( result );
         } )
 
+        //POST API (Add a Review)
+        app.post( '/reviews', async ( req, res ) => {
+            const review = req.body;
+            const result = await reviewsCollection.insertOne( review );
+            res.json( result );
+        } );
+
         //DELETE an Order API
         app.delete( '/orders/:id', async ( req, res ) => {
             const id = req.params.id;
@@ -86,14 +93,6 @@ const run = async () => {
         //     const result = await watchesCollection.insertOne( watch );
         //     res.json( result );
         // } );
-
-        //POST API (Add a Review)
-        // app.post( '/reviews', async ( req, res ) => {
-        //     const review = req.body;
-        //     const result = await reviewsCollection.insertOne( review );
-        //     res.json( result );
-        // } );
-
 
 
         //UPDATE Watch API
