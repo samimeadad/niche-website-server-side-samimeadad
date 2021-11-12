@@ -20,27 +20,30 @@ const run = async () => {
         await client.connect();
         console.log( 'database connected' );
 
+        //Create the database
         const database = client.db( "watchYourWrist" );
+
+        //Create the collections
         const watchesCollection = database.collection( "watches" );
         const reviewsCollection = database.collection( "reviews" );
         const ordersCollection = database.collection( "orders" );
         const usersCollection = database.collection( "users" );
 
-        //GET Watches API
+        //GET Watches API (Send all watches information to the client)
         app.get( '/watches', async ( req, res ) => {
             const cursor = watchesCollection.find( {} );
             const watches = await cursor.toArray();
             res.send( watches );
         } );
 
-        //GET Reviews API
+        //GET Reviews API (Send all reviews information to the client)
         app.get( '/reviews', async ( req, res ) => {
             const cursor = reviewsCollection.find( {} );
             const reviews = await cursor.toArray();
             res.send( reviews );
         } );
 
-        //GET Orders API
+        //GET Orders API (Send all orders information to the client)
         app.get( '/orders', async ( req, res ) => {
             const cursor = ordersCollection.find( {} );
             const orders = await cursor.toArray();
@@ -62,7 +65,7 @@ const run = async () => {
             res.json( result );
         } )
 
-        //POST API (Update the User with Google Login)
+        //POST API (Update/Insert-upsert the User with Google Login)
         app.put( '/users', async ( req, res ) => {
             const user = req.body;
             const query = { email: user.email };
@@ -86,6 +89,37 @@ const run = async () => {
             const result = await ordersCollection.deleteOne( query );
             res.json( result );
         } );
+
+        //GET API (Get user information to check if the user is an admin)
+        app.get( '/users/:email', async ( req, res ) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne( query );
+            let isAdmin = false;
+            if ( user?.role === 'admin' ) {
+                isAdmin = true;
+            }
+            res.json( { admin: isAdmin } );
+        } )
+
+        //UPDATE API (Update a user to make him/her an admin)
+        app.put( '/users/admin', async ( req, res ) => {
+            const user = req.body;
+            const requester = req.decodedEmail;
+            if ( requester ) {
+                const requesterAccount = await usersCollection.findOne( { email: requester } );
+
+                if ( requesterAccount.role === 'admin' ) {
+                    const query = { email: user.adminEmail };
+                    const updateDoc = { $set: { role: 'admin' } };
+                    const result = await usersCollection.updateOne( query, updateDoc );
+                    res.json( result );
+                }
+            }
+            else {
+                res.status( 403 ).json( { error: 'You don not have authority to make admin' } );
+            }
+        } )
 
         //POST API (Add a Watch)
         // app.post( '/watches', async ( req, res ) => {
@@ -125,7 +159,6 @@ const run = async () => {
 }
 
 run().catch( console.dir );
-
 
 app.get( '/', ( req, res ) => {
     res.send( 'Hello World! Niche Product Server Side App is running successfully' );
