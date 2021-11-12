@@ -105,6 +105,7 @@ const run = async () => {
         //UPDATE API (Update a user to make him/her an admin)
         app.put( '/users/admin', async ( req, res ) => {
             const user = req.body;
+            console.log( user );
             const requester = req.decodedEmail;
             if ( requester ) {
                 const requesterAccount = await usersCollection.findOne( { email: requester } );
