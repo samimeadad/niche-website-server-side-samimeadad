@@ -50,6 +50,13 @@ const run = async () => {
             res.send( orders );
         } );
 
+        //GET Users API (Send all users information to the client)
+        app.get( '/users', async ( req, res ) => {
+            const cursor = usersCollection.find( {} );
+            const users = await cursor.toArray();
+            res.send( users );
+        } );
+
         //POST API (Add a Order)
         app.post( '/orders', async ( req, res ) => {
             const order = req.body;
