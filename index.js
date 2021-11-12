@@ -107,6 +107,7 @@ const run = async () => {
             const user = req.body;
             console.log( user );
             const requester = req.decodedEmail;
+            console.log( requester );
             if ( requester ) {
                 const requesterAccount = await usersCollection.findOne( { email: requester } );
 
