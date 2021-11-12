@@ -3,7 +3,7 @@ const express = require( 'express' );
 const app = express();
 const port = process.env.PORT || 5001;
 const cors = require( 'cors' );
-// const ObjectId = require( 'mongodb' ).ObjectId;
+const ObjectId = require( 'mongodb' ).ObjectId;
 
 //middleware
 app.use( cors() );
@@ -23,7 +23,8 @@ const run = async () => {
         const database = client.db( "watchYourWrist" );
         const watchesCollection = database.collection( "watches" );
         const reviewsCollection = database.collection( "reviews" );
-        // const ordersCollection = database.collection( "orders" );
+        const ordersCollection = database.collection( "orders" );
+        const usersCollection = database.collection( "users" );
 
         //GET Watches API
         app.get( '/watches', async ( req, res ) => {
@@ -37,6 +38,46 @@ const run = async () => {
             const cursor = reviewsCollection.find( {} );
             const reviews = await cursor.toArray();
             res.send( reviews );
+        } );
+
+        //GET Orders API
+        app.get( '/orders', async ( req, res ) => {
+            const cursor = ordersCollection.find( {} );
+            const orders = await cursor.toArray();
+            res.send( orders );
+        } );
+
+        //POST API (Add a Order)
+        app.post( '/orders', async ( req, res ) => {
+            const order = req.body;
+            const result = await ordersCollection.insertOne( order );
+            res.json( result );
+        } );
+
+        //POST API (Add a User with email/password)
+        app.post( '/users', async ( req, res ) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne( user );
+            console.log( result );
+            res.json( result );
+        } )
+
+        //POST API (Update the User with Google Login)
+        app.put( '/users', async ( req, res ) => {
+            const user = req.body;
+            const query = { email: user.email };
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await usersCollection.updateOne( query, updateDoc, options );
+            res.json( result );
+        } )
+
+        //DELETE an Order API
+        app.delete( '/orders/:id', async ( req, res ) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId( id ) };
+            const result = await ordersCollection.deleteOne( query );
+            res.json( result );
         } );
 
         //POST API (Add a Watch)
@@ -53,12 +94,7 @@ const run = async () => {
         //     res.json( result );
         // } );
 
-        //POST API (Add a Order)
-        // app.post( '/orders', async ( req, res ) => {
-        //     const order = req.body;
-        //     const result = await ordersCollection.insertOne( order );
-        //     res.json( result );
-        // } );
+
 
         //UPDATE Watch API
         // app.put( '/watches/:id', async ( req, res ) => {
