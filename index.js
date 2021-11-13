@@ -138,21 +138,21 @@ const run = async () => {
         // } );
 
 
-        //UPDATE Watch API
-        // app.put( '/watches/:id', async ( req, res ) => {
-        //     const watchId = req.params.id;
-        //     const updateWatch = req.body;
-        //     const query = { _id: ObjectId( watchId ) };
-        //     const options = { upsert: true };
-        //     const updateDoc = {
-        //         $set: {
-        //             status: updateWatch.status
-        //         },
-        //     };
+        //UPDATE API (Update the order status to Shipped)
+        app.put( '/orders/:id', async ( req, res ) => {
+            const orderId = req.params.id;
+            const updateOrder = req.body;
+            const query = { _id: ObjectId( orderId ) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: updateOrder.status
+                },
+            };
 
-        //     const result = await watchesCollection.updateOne( query, updateDoc, options );
-        //     res.json( result );
-        // } );
+            const result = await ordersCollection.updateOne( query, updateDoc, options );
+            res.json( result );
+        } );
 
         //DELETE a Watch API
         // app.delete( '/watches/:id', async ( req, res ) => {
