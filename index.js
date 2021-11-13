@@ -114,9 +114,9 @@ const run = async () => {
 
         //UPDATE API (Update the order status to Shipped)
         app.put( '/orders', async ( req, res ) => {
-            const orderId = req.params.id;
+            // const orderId = req.params.id;
             const updateOrder = req.body;
-            const query = { _id: ObjectId( orderId ) };
+            const query = { _id: ObjectId( updateOrder._id ) };
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
