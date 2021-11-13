@@ -131,11 +131,11 @@ const run = async () => {
         } )
 
         //POST API (Add a Watch)
-        // app.post( '/watches', async ( req, res ) => {
-        //     const watch = req.body;
-        //     const result = await watchesCollection.insertOne( watch );
-        //     res.json( result );
-        // } );
+        app.post( '/watches', async ( req, res ) => {
+            const watch = req.body;
+            const result = await watchesCollection.insertOne( watch );
+            res.json( result );
+        } );
 
 
         //UPDATE API (Update the order status to Shipped)
@@ -151,7 +151,6 @@ const run = async () => {
                     status: updateOrder.status
                 },
             };
-
             const result = await ordersCollection.updateOne( query, updateDoc, options );
             res.json( result );
         } );
