@@ -143,6 +143,7 @@ const run = async () => {
             const orderId = req.params.id;
             console.log( orderId );
             const updateOrder = req.body;
+            console.log( updateOrder );
             const query = { _id: ObjectId( orderId ) };
             const options = { upsert: true };
             const updateDoc = {
