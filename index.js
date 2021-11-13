@@ -110,7 +110,7 @@ const run = async () => {
         } )
 
         //UPDATE API (Update a user to make him/her an admin)
-        app.put( '/users/admin', async ( req, res ) => {
+        app.put( '/users', async ( req, res ) => {
             const user = req.body;
             console.log( user );
             const requester = req.decodedEmail;
@@ -120,7 +120,11 @@ const run = async () => {
 
                 if ( requesterAccount.role === 'admin' ) {
                     const query = { email: user.adminEmail };
-                    const updateDoc = { $set: { role: 'admin' } };
+                    const updateDoc = {
+                        $set: {
+                            role: 'admin'
+                        }
+                    };
                     const result = await usersCollection.updateOne( query, updateDoc );
                     res.json( result );
                 }
