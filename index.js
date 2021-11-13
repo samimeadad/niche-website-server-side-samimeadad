@@ -57,10 +57,24 @@ const run = async () => {
             res.send( users );
         } );
 
+        //POST API (Add a Watch)
+        app.post( '/watches', async ( req, res ) => {
+            const watch = req.body;
+            const result = await watchesCollection.insertOne( watch );
+            res.json( result );
+        } );
+
         //POST API (Add a Order)
         app.post( '/orders', async ( req, res ) => {
             const order = req.body;
             const result = await ordersCollection.insertOne( order );
+            res.json( result );
+        } );
+
+        //POST API (Add a Review)
+        app.post( '/reviews', async ( req, res ) => {
+            const review = req.body;
+            const result = await reviewsCollection.insertOne( review );
             res.json( result );
         } );
 
@@ -72,7 +86,7 @@ const run = async () => {
             res.json( result );
         } )
 
-        //POST API (Update/Insert-upsert the User with Google Login)
+        //PUT API (Update/Insert-upsert the User with Google Login)
         app.put( '/users', async ( req, res ) => {
             const user = req.body;
             const query = { email: user.email };
@@ -82,18 +96,35 @@ const run = async () => {
             res.json( result );
         } )
 
-        //POST API (Add a Review)
-        app.post( '/reviews', async ( req, res ) => {
-            const review = req.body;
-            const result = await reviewsCollection.insertOne( review );
-            res.json( result );
-        } );
-
         //DELETE an Order API
         app.delete( '/orders/:id', async ( req, res ) => {
             const id = req.params.id;
             const query = { _id: ObjectId( id ) };
             const result = await ordersCollection.deleteOne( query );
+            res.json( result );
+        } );
+
+        //DELETE a Watch API
+        app.delete( '/watches/:id', async ( req, res ) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId( id ) };
+            const result = await watchesCollection.deleteOne( query );
+            res.json( result );
+        } );
+
+        //UPDATE API (Update the order status to Shipped)
+        app.put( '/orders/:id', async ( req, res ) => {
+            const orderId = req.params.id;
+            console.log( orderId );
+            const updateOrder = req.body;
+            const query = { _id: ObjectId( orderId ) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: updateOrder.status
+                },
+            };
+            const result = await ordersCollection.updateOne( query, updateDoc, options );
             res.json( result );
         } );
 
@@ -131,38 +162,6 @@ const run = async () => {
                 res.status( 403 ).json( { error: 'You don not have authority to make admin' } );
             }
         } )
-
-        //POST API (Add a Watch)
-        app.post( '/watches', async ( req, res ) => {
-            const watch = req.body;
-            const result = await watchesCollection.insertOne( watch );
-            res.json( result );
-        } );
-
-
-        //UPDATE API (Update the order status to Shipped)
-        app.put( '/orders/:id', async ( req, res ) => {
-            const orderId = req.params.id;
-            console.log( orderId );
-            const updateOrder = req.body;
-            const query = { _id: ObjectId( orderId ) };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: {
-                    status: updateOrder.status
-                },
-            };
-            const result = await ordersCollection.updateOne( query, updateDoc, options );
-            res.json( result );
-        } );
-
-        //DELETE a Watch API
-        app.delete( '/watches/:id', async ( req, res ) => {
-            const id = req.params.id;
-            const query = { _id: ObjectId( id ) };
-            const result = await watchesCollection.deleteOne( query );
-            res.json( result );
-        } );
     }
     finally {
         // await client.close();
